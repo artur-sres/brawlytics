@@ -129,6 +129,8 @@ celerybeat.pid
 
 # Environments
 .env
+database/
+__pycache__/
 .venv
 env/
 venv/
