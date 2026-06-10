@@ -1,23 +1,18 @@
-from data.collector.collector import fetch_battlelog, save_match
-from data.database.db import init_db
-from data.database.db import get_connection
+# Importa a função de inicialização do seu arquivo de banco de dados
+from data.database.db import initdb
 
+# Importa a função principal do seu arquivo de coleta
+from data.collector.collector import executar_coleta 
 
-def run():
-    init_db()
+def main():
+    print("Verificando/Inicializando o banco de dados...")
+    initdb()
+    
+    print("Iniciando o motor de coleta da API...")
+    executar_coleta()
+    
+    print("Operação concluída com sucesso.")
 
-    data = fetch_battlelog()
-    if not data:
-        return
-
-    conn = get_connection()
-
-    for item in data["items"]:
-        save_match(conn, item)
-
-    conn.close()
-    print("Coleta finalizada com sucesso.")
-
-
+# Trava de segurança padrão do Python
 if __name__ == "__main__":
-    run()
+    main()
