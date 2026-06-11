@@ -20,7 +20,7 @@ def localizar_arquivo(nome_arquivo):
 
 @st.cache_data
 def carregar_dados_banco():
-    """Lê a base de dados em cache para não travar a interface."""
+    """Lê a base de dados em cache e filtra os modos indesejados."""
     caminho_db = localizar_arquivo('brawl_data.db') or localizar_arquivo('raw_events.sqlite')
     if not caminho_db:
         return [], {}, []
@@ -28,8 +28,14 @@ def carregar_dados_banco():
     conn = sqlite3.connect(caminho_db)
     cur = conn.cursor()
 
+    # Blacklist para a interface
+    MODOS_IGNORADOS = ['duoShowdown', 'soloShowdown', 'siege', 'bigGame', 'bossFight', 'roboRumble']
+
     cur.execute("SELECT DISTINCT mode FROM matches")
-    modos = [row[0] for row in cur.fetchall()]
+    modos_brutos = [row[0] for row in cur.fetchall()]
+    
+    # Filtra: Só guarda o modo se ele NÃO estiver na blacklist
+    modos = [m for m in modos_brutos if m not in MODOS_IGNORADOS]
 
     mapas_por_modo = {}
     for modo in modos:

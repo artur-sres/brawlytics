@@ -2,17 +2,48 @@ import pandas as pd
 import os
 from data.database.db import get_connection
 
+def limpar_mapas_comunidade(df):
+    """
+    Remove do DataFrame todas as partidas jogadas em mapas da comunidade,
+    utilizando a pasta assets/maps como a única lista autorizada.
+    """
+    # 1. Localiza a pasta dos mapas
+    diretorio_raiz = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    pasta_mapas = os.path.join(diretorio_raiz, 'assets', 'maps')
+    
+    # 2. Extrai os nomes limpos de todas as imagens .png
+    # Ex: 'Super_Beach.png' transforma-se em 'Super Beach'
+    mapas_oficiais = []
+    if os.path.exists(pasta_mapas):
+        for ficheiro in os.listdir(pasta_mapas):
+            if ficheiro.lower().endswith('.png'):
+                nome_limpo = ficheiro[:-4].replace('_', ' ')
+                mapas_oficiais.append(nome_limpo)
+                
+    # 3. Elimina do dataset as linhas onde o mapa não está na lista oficial
+    linhas_iniciais = len(df)
+    df_limpo = df[df['map'].isin(mapas_oficiais)]
+    linhas_removidas = linhas_iniciais - len(df_limpo)
+    
+    print(f"Filtro de Ruído: {linhas_removidas} partidas em mapas da comunidade foram ignoradas.")
+    return df_limpo
+
 def construir_dataset():
     print("A extrair dados relacionais da base de dados...")
     conn = get_connection()
     
     # 1. Nova Query: Agora inclui 'power' e 'trophies'
-    query = """
+    # 1. Nova Query com Blacklist de Modos
+    # Pode adicionar qualquer modo que não queira nesta tupla (mantenha as aspas)
+    modos_ignorados = ('duoShowdown', 'soloShowdown', 'siege', 'bigGame', 'bossFight', 'roboRumble', 'trophyThieves', 'wipeout', 'botDrop')
+    
+    query = f"""
     SELECT 
         m.match_hash, m.mode, m.map, 
         mp.team_id, mp.brawler_name, mp.power, mp.trophies, mp.result
     FROM matches m
     JOIN match_players mp ON m.match_hash = mp.match_hash
+    WHERE m.mode NOT IN {modos_ignorados}
     """
     df_raw = pd.read_sql_query(query, conn)
     conn.close()
@@ -83,6 +114,7 @@ def construir_dataset():
         })
 
     dataset = pd.DataFrame(dados_planos)
+    dataset = limpar_mapas_comunidade(dataset)
     
     diretorio_raiz = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     caminho_csv = os.path.join(diretorio_raiz, 'dataset_brawl.csv')
