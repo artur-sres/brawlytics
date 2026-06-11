@@ -25,19 +25,24 @@ def treinar_modelo():
     # Converte 'mode' e 'map' em colunas de 0 e 1
     df_encoded = pd.get_dummies(df, columns=['mode', 'map'])
 
-    # 2. Transformação do Grafo de Equipas (Multi-Hot Encoding)
+# 2. Transformação do Grafo de Equipas (Multi-Hot Encoding)
     print("A nivelar a ordem dos Brawlers (Invariância Permutacional)...")
     todos_brawlers = set(df['t0_brawler_1']).union(
         df['t0_brawler_2'], df['t0_brawler_3'],
         df['t1_brawler_1'], df['t1_brawler_2'], df['t1_brawler_3']
     )
 
-    # Criação de matriz zero para cada Brawler possível
+    # CORREÇÃO DE PERFORMANCE: Criação de todas as colunas de uma vez só em um dicionário
+    novas_colunas = {}
     for brawler in todos_brawlers:
-        df_encoded[f't0_{brawler}'] = 0
-        df_encoded[f't1_{brawler}'] = 0
+        novas_colunas[f't0_{brawler}'] = 0
+        novas_colunas[f't1_{brawler}'] = 0
 
-    # Povoamento binário: assinala '1' se o brawler estiver na equipa, ignorando o slot
+    # Converte o dicionário em DataFrame temporário e une ao principal sem fragmentar a memória
+    df_novas = pd.DataFrame(novas_colunas, index=df_encoded.index)
+    df_encoded = pd.concat([df_encoded, df_novas], axis=1)
+
+    # Povoamento binário: assinala '1' se o brawler estiver na equipe, ignorando o slot
     for i in range(1, 4):
         for brawler in todos_brawlers:
             df_encoded.loc[df[f't0_brawler_{i}'] == brawler, f't0_{brawler}'] = 1

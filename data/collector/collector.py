@@ -48,7 +48,7 @@ def executar_coleta():
     conn.commit()
 
     # 2. Configuração do Limite de Segurança
-    LIMITE_POR_LOTE = 50
+    LIMITE_POR_LOTE = 200
     alvos_processados = 0
 
     print(f"Motor Crawler iniciado. Limite configurado para {LIMITE_POR_LOTE} alvos.")
@@ -75,14 +75,27 @@ def executar_coleta():
             if resposta.status_code == 200:
                 battlelog = resposta.json().get("items", [])
                 
+                # BARREIRA DE VARIÂNCIA: Rastreia os mapas já extraídos para ESTE jogador
+                mapas_vistos = set()
+                
                 for item in battlelog:
                     battle = item.get("battle", {})
+                    
+                    # Filtra apenas partidas de modo 3v3 (que possuem 'teams')
                     if "teams" not in battle:
                         continue
                         
+                    map_name = item.get("event", {}).get("map")
+                    
+                    # FILTRO DE REDUNDÂNCIA: Se o mapa já foi processado hoje para este alvo, salta a partida
+                    if map_name in mapas_vistos:
+                        continue
+                        
+                    # Registra o mapa como visto e prossegue com a extração
+                    mapas_vistos.add(map_name)
+                    
                     battle_time = item.get("battleTime")
                     mode = battle.get("mode")
-                    map_name = item.get("event", {}).get("map")
                     duration = battle.get("duration", 0)
                     
                     todas_tags_partida = []
