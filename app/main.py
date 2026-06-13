@@ -11,9 +11,32 @@ from views.draft_view import render_draft
 st.set_page_config(page_title="Brawl-ML Control", page_icon="🤖", layout="wide")
 init_language()
 
+def fix_sidebar_width():
+    st.markdown(
+        """
+        <style>
+            /* 1. Trava a largura da sidebar em 450px (ajuste o valor conforme necessario) */
+            [data-testid="stSidebar"] {
+                min-width: 450px !important;
+                max-width: 450px !important;
+                width: 450px !important;
+            }
+            
+            /* 2. Impede que o texto de navegacao quebre a linha */
+            [data-testid="stSidebarNav"] span {
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+fix_sidebar_width()
 with st.sidebar:
     selected_language = st.selectbox(
-        "🌍 Language / Idioma", 
+        "Language / Idioma", 
         options=['en', 'pt'], 
         format_func=lambda x: "English" if x == 'en' else "Português",
         index=0 if st.session_state['lang'] == 'en' else 1
@@ -27,8 +50,8 @@ with st.sidebar:
 
     page = option_menu(
         menu_title="Brawl-ML",
-        options=[t("nav_meta"), t("nav_draft"), t("nav_predictor")], # Adicione as outras chaves aqui
-        icons=["bar-chart", "crosshair"],
+        options=[t("nav_meta"), t("nav_predictor"), t("nav_draft")], 
+        icons=["bar-chart", "crosshair", "robot"],
         menu_icon="robot", default_index=0, 
         styles={
             "container": {"padding": "5!important", "background-color": "transparent"},
