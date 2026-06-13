@@ -91,7 +91,7 @@ with st.sidebar:
         st.rerun()
 
 if page_meta == t("nav_meta"): render_meta()
-elif page_meta == t("meta_brawler_title"): render_meta_brawler()
+elif page_meta == t("meta_brawler"): render_meta_brawler()
 elif page_meta == t("nav_modes"): render_modes()
 
 elif page_simulators == t("nav_draft"): render_draft()
