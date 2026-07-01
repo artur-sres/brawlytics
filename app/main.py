@@ -9,35 +9,31 @@ from i18n import init_language, t, switch_language
 from views.meta_view import render_meta
 from views.draft_view import render_draft
 
-st.set_page_config(page_title="Brawl-ML Control", page_icon="robot", layout="wide")
+st.set_page_config(page_title="Brawlytics", page_icon="robot", layout="wide")
 init_language()
 
 def fix_sidebar_width():
     st.markdown(
         """
         <style>
-            /* 1. Trava a largura da sidebar */
             [data-testid="stSidebar"] {
                 min-width: 400px !important;
                 max-width: 400px !important;
                 width: 400px !important;
             }
             
-            /* 2. Impede que o texto de navegacao quebre a linha */
             [data-testid="stSidebarNav"] span {
                 white-space: nowrap !important;
                 overflow: hidden !important;
                 text-overflow: ellipsis !important;
             }
             
-            /* 3. Prepara a barra lateral para ter flexibilidade vertical */
             [data-testid="stSidebarUserContent"] > div {
                 display: flex;
                 flex-direction: column;
                 height: 88vh; 
             }
             
-            /* 4. Localiza EXATAMENTE o widget de idioma e empurra-o para o fundo */
             [data-testid="stSidebarUserContent"] div[data-testid="stElementContainer"]:has([data-testid="stSelectbox"]) {
                 margin-top: auto !important;
                 padding-bottom: 20px;
@@ -50,10 +46,10 @@ def fix_sidebar_width():
 fix_sidebar_width()
 
 with st.sidebar:
-    page_meta = option_menu(
-        menu_title=t("nav_metas"),
-        options=[t("nav_meta"), t("nav_modes"), t("meta_brawler"), t("nav_predictor"), t("nav_draft")], 
-        icons=["bar-chart", "crosshair", "robot", "map", "trophy"],
+    nav = option_menu(
+        menu_title=t("nav"),
+        options=[t("meta_brawlers"), t("meta_brawlers_mode"), t("meta_brawlers_map"), t("win_predictor"), t("draft_simulator")], 
+        icons=["bar-chart", "crosshair", "map", "robot", "trophy"],
         menu_icon="robot", 
         default_index=0, 
         styles={
@@ -66,9 +62,9 @@ with st.sidebar:
     
     
     selected_language = st.selectbox(
-        "Language / Idioma", 
+        t("language"), 
         options=['en', 'pt'], 
-        format_func=lambda x: "English" if x == 'en' else "Português",
+        format_func=lambda x: t("english") if x == 'en' else t("portuguese"),
         index=0 if st.session_state['lang'] == 'en' else 1
     )
     
@@ -76,8 +72,8 @@ with st.sidebar:
         switch_language(selected_language)
         st.rerun()
 
-if page_meta == t("nav_meta"): render_meta()
-elif page_meta == t("meta_brawler"): render_meta_brawler()
-elif page_meta == t("nav_modes"): render_modes()
-elif page_meta == t("nav_draft"): render_draft()
-elif page_meta == t("nav_predictor"): render_predictor()
+if nav == t("meta_brawlers"): render_meta_brawler()
+elif nav == t("meta_brawlers_mode"): render_modes()
+elif nav == t("meta_brawlers_map"): render_meta()
+elif nav == t("win_predictor"): render_predictor()
+elif nav == t("draft_simulator"): render_draft()

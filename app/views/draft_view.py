@@ -25,6 +25,7 @@ def render_draft():
     with main_col:
         st.title(t('draft_title'))
         st.markdown(t("draft_subtitle"))
+        st.markdown(t("draft_subtitle_2"))
 
         modes, maps_by_mode, valid_brawlers = load_database_data()
         model, training_columns = load_model()
@@ -135,4 +136,4 @@ def render_draft():
                     
         elif len(selected_allies) == 3 and len(selected_enemies) < 3:
             # Captura o estado de limbo e orienta o utilizador
-            st.info("Selecione os brawlers inimigos restantes para calcular a probabilidade de vitoria.")
+            st.info(t("select_remaining_enemies"))

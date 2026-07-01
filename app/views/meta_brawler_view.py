@@ -33,23 +33,18 @@ def extract_meta_brawler_statistics():
     conn.close()
 
     if not df.empty:
-        # 1. Filtro de significancia estatistica
         df = df[df['Total_Picks'] >= 10].copy()
         
         if df.empty:
             return df
             
-        # 2. Calculo da Taxa de Vitoria
         df['Win_Rate'] = (df['Wins'] / df['Total_Picks']) * 100
         
-        # 3. Normalizacao da Taxa de Escolha (O mais escolhido = 100)
         max_picks = df['Total_Picks'].max()
         df['Pick_Score'] = (df['Total_Picks'] / max_picks) * 100
         
-        # 4. Calculo do Meta Score (60% Vitoria, 40% Presenca)
         df['Meta_Score'] = (df['Win_Rate'] * 0.6) + (df['Pick_Score'] * 0.4)
         
-        # Arredondamento para apresentacao limpa
         df['Meta_Score'] = df['Meta_Score'].round(1)
         
     return df

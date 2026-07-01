@@ -30,11 +30,11 @@ def render_predictor():
         model, training_columns = load_model()
 
         if not modes:
-            st.error(t("error_missing_db"))
+            st.error(t("error_empty_db"))
             st.stop()
 
         if not model:
-            st.error(t("error_missing_artifacts"))
+            st.error(t("error_missing_model"))
             st.stop()
 
         st.markdown("---")
@@ -48,7 +48,7 @@ def render_predictor():
                 t("game_mode"), 
                 options=modes, 
                 index=None, 
-                placeholder="Selecione o modo...",
+                placeholder=t("select_mode"),
                 key="pred_mode"
             )
             
@@ -56,7 +56,7 @@ def render_predictor():
                 t("map"), 
                 options=maps_by_mode.get(selected_mode, []) if selected_mode else [], 
                 index=None, 
-                placeholder="Selecione o mapa...",
+                placeholder=t("select_map"),
                 key="pred_map",
                 disabled=not selected_mode
             )
@@ -132,7 +132,7 @@ def render_predictor():
             if len(set(all_selected)) < len(all_selected):
                 st.error(t('error_duplicate_brawlers'))
             elif len(selected_allies) < 3 or len(selected_enemies) < 3:
-                st.warning("Selecione os 6 brawlers para efetuar o calculo.")
+                st.warning(t("select_all_brawlers"))
             else:
                 st.subheader(t('analysis_result'))
                 prob_defeat, prob_victory = calculate_static_probability(
@@ -149,4 +149,4 @@ def render_predictor():
                     st.warning(t("verdict_balanced"))
         else:
             if len(selected_allies) < 3 or len(selected_enemies) < 3:
-                st.info("Preencha as duas equipas e clique no botao para calcular.")
+                st.info(t("select_all_brawlers"))

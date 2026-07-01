@@ -53,7 +53,6 @@ def load_database_data():
 @st.cache_resource
 def load_model():
     """Loads the model and columns directly from the data/storage folder."""
-    # Define o caminho absoluto para a pasta de storage
     base_storage = os.path.join(os.path.dirname(__file__), '..', 'data', 'storage')
     
     model_path = os.path.join(base_storage, 'model.pkl')

@@ -63,7 +63,7 @@ def render_meta():
                 t("game_mode"), 
                 options=modes, 
                 index=None, 
-                placeholder="Selecione o modo...",
+                placeholder=t("select_mode"),
                 key="meta_mode"
             )
             
@@ -71,7 +71,7 @@ def render_meta():
                 t("map"), 
                 options=maps_by_mode.get(selected_mode, []) if selected_mode else [], 
                 index=None, 
-                placeholder="Selecione o mapa...",
+                placeholder=t("select_map"),
                 key="meta_map",
                 disabled=not selected_mode
             )
