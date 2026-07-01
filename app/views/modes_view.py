@@ -86,7 +86,7 @@ def render_modes():
                         "Win_Rate": st.column_config.ProgressColumn(t("win_rate"), format="%.1f%%", min_value=0, max_value=100),
                     },
                     hide_index=True,
-                    use_container_width=True
+                    width='stretch'
                 )
             
             with col_wins:
@@ -99,7 +99,7 @@ def render_modes():
                         "Total_Picks": st.column_config.NumberColumn(t("matches"), format="%d"),
                     },
                     hide_index=True,
-                    use_container_width=True
+                    width='stretch'
                 )
             
             st.markdown("---")

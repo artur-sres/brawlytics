@@ -52,7 +52,7 @@ fix_sidebar_width()
 with st.sidebar:
     page_meta = option_menu(
         menu_title=t("nav_metas"),
-        options=[t("nav_meta"), t("nav_modes"), t("meta_brawler")], 
+        options=[t("nav_meta"), t("nav_modes"), t("meta_brawler"), t("nav_predictor"), t("nav_draft")], 
         icons=["bar-chart", "crosshair", "robot", "map", "trophy"],
         menu_icon="robot", 
         default_index=0, 
@@ -64,20 +64,6 @@ with st.sidebar:
         }
     )
     
-with st.sidebar:
-    page_simulators = option_menu(
-        menu_title=t("nav_simulators"),
-        options=[t("nav_predictor"), t("nav_draft")], 
-        icons=["bar-chart", "crosshair", "robot", "map", "trophy"],
-        menu_icon="robot", 
-        default_index=0, 
-        styles={
-            "container": {"padding": "5!important", "background-color": "transparent"},
-            "icon": {"color": "#ffc107", "font-size": "20px"}, 
-            "nav-link": {"font-size": "15px", "text-align": "left", "margin":"0px"},
-            "nav-link-selected": {"background-color": "#2e7bcf"},
-        }
-    )
     
     selected_language = st.selectbox(
         "Language / Idioma", 
@@ -93,6 +79,5 @@ with st.sidebar:
 if page_meta == t("nav_meta"): render_meta()
 elif page_meta == t("meta_brawler"): render_meta_brawler()
 elif page_meta == t("nav_modes"): render_modes()
-
-elif page_simulators == t("nav_draft"): render_draft()
-elif page_simulators == t("nav_predictor"): render_predictor()
+elif page_meta == t("nav_draft"): render_draft()
+elif page_meta == t("nav_predictor"): render_predictor()

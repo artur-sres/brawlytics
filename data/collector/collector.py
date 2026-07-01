@@ -14,6 +14,26 @@ def generate_match_hash(battle_time, tag_list):
     base_string = battle_time + "".join(sorted_tags)
     return hashlib.sha256(base_string.encode('utf-8')).hexdigest()
 
+def inject_fresh_blood(cur, conn, headers):
+    """Busca os top jogadores globais para quebrar a bolha de matchmaking."""
+    print("\n[Injeção Automática] Buscando novos jogadores fora da bolha atual...")
+    url = f"{BASE_URL}/rankings/global/players?limit=50"
+    
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        players = response.json().get("items", [])
+        for p in players:
+            # Insere novos jogadores. Se já existirem, o IGNORE ignora.
+            # last_scanned como NULL garante que eles irão para o topo da fila.
+            cur.execute(
+                "INSERT OR IGNORE INTO players (tag, name, last_scanned) VALUES (?, ?, NULL)",
+                (p.get("tag"), p.get("name"))
+            )
+        conn.commit()
+        print(f"[Injeção Automática] Até {len(players)} novos jogadores de elite adicionados à fila.\n")
+    elif response.status_code == 429:
+        print("[Injeção Automática] Rate limit atingido. Tentaremos injetar depois.\n")
+
 def run_collector():
     """Main function that orchestrates data collection from the API as a Crawler."""
     load_dotenv()
@@ -54,7 +74,7 @@ def run_collector():
                         (seed, "Elite Seed"))
         conn.commit()
 
-    BATCH_LIMIT = 200
+    BATCH_LIMIT = 500
     processed_targets = 0
 
     print(f"Crawler Engine started. Limit set to {BATCH_LIMIT} targets.")
@@ -64,6 +84,9 @@ def run_collector():
 
     try:
         while processed_targets < BATCH_LIMIT:
+            if processed_targets > 0 and processed_targets % 50 == 0:
+                inject_fresh_blood(cur, conn, HEADERS)
+            
             # Polling mechanism: Fetch players never scanned OR scanned more than 20 days ago
             fetch_query = """
                 SELECT tag FROM players 
@@ -89,7 +112,6 @@ def run_collector():
                 battlelog = response.json().get("items", [])
                 
                 # VARIANCE BARRIER 2.0: Tracks (Map, Brawler) combinations
-                seen_combinations = set()
                 
                 for item in battlelog:
                     battle = item.get("battle", {})
@@ -113,14 +135,6 @@ def run_collector():
                             
                     if not target_brawler:
                         continue
-                        
-                    # Tuple check: Did this player already give us data for this Map WITH this Brawler?
-                    combo_key = (map_name, target_brawler)
-                    if combo_key in seen_combinations:
-                        continue
-                        
-                    # If new combo, add it and proceed
-                    seen_combinations.add(combo_key)
                     
                     battle_time = item.get("battleTime")
                     mode = battle.get("mode")
@@ -178,7 +192,7 @@ def run_collector():
             
             processed_targets += 1
             print(f"Progress: {processed_targets}/{BATCH_LIMIT} processed.\n")
-            time.sleep(1)
+            time.sleep(0.6)
 
         print(f"Batch of {BATCH_LIMIT} processed successfully. Safety stop.")
 

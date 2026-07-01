@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import sys
+import hashlib
 
 # Ensures the root directory is recognized for absolute imports
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -86,6 +87,16 @@ def build_dataset():
             continue 
 
         target = 1 if result_t0 == 'victory' else 0
+
+        # Anti-Bias Shuffle: team_id 0 originally correlates with the crawler's
+        # target player's team (and thus with stronger players), creating a
+        # ~55/45 victory skew. We deterministically swap "team 0" and "team 1"
+        # based on the match_hash, so the label no longer leaks "who was the
+        # crawler's seed player".
+        swap = int(hashlib.sha256(match_hash.encode('utf-8')).hexdigest(), 16) % 2 == 1
+        if swap:
+            brawlers_t0, brawlers_t1 = brawlers_t1, brawlers_t0
+            target = 1 - target
 
         # Assembly of the final matrix (Pure Meta: no power or trophies)
         flat_data.append({

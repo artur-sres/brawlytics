@@ -86,7 +86,7 @@ def render_meta_brawler():
                 
                 if img_path:
                     with c_img:
-                        st.image(img_path, use_container_width=True)
+                        st.image(img_path, width='stretch')
                 else:
                     with c_img:
                         no_photo_text = t("no_photo").format(brawler)
@@ -112,7 +112,7 @@ def render_meta_brawler():
                     "Total_Picks": st.column_config.NumberColumn(t("matches"), format="%d")
                 },
                 hide_index=True,
-                use_container_width=True
+                width='stretch'
             )
             
         with col_wins:
@@ -124,7 +124,7 @@ def render_meta_brawler():
                     "Win_Rate": st.column_config.ProgressColumn(t("win_rate"), format="%.1f%%", min_value=0, max_value=100)
                 },
                 hide_index=True,
-                use_container_width=True
+                width='stretch'
             )
             
         with col_meta:
@@ -136,5 +136,5 @@ def render_meta_brawler():
                     "Meta_Score": st.column_config.NumberColumn("Score", format="%.1f")
                 },
                 hide_index=True,
-                use_container_width=True
+                width='stretch'
             )
