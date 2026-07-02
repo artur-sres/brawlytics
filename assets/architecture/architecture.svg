@@ -1,0 +1,112 @@
+<svg viewBox="0 0 1000 1040" xmlns="http://www.w3.org/2000/svg" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6B7280"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1000" height="1040" fill="#FFFFFF"/>
+
+  <text x="500" y="34" text-anchor="middle" font-size="22" font-weight="bold" fill="#1F2430">Brawlytics — Pipeline &amp; App Architecture</text>
+  <text x="500" y="54" text-anchor="middle" font-size="12" fill="#6B7280">All stages orchestrated through run.py</text>
+
+  <!-- lane background groups -->
+  <rect x="40" y="78" width="300" height="368" rx="16" fill="#FFF7E6"/>
+  <rect x="630" y="315" width="300" height="356" rx="16" fill="#EEF1FC"/>
+  <rect x="70" y="735" width="860" height="240" rx="16" fill="#EAF6F2"/>
+
+  <!-- lane labels -->
+  <text x="190" y="100" text-anchor="middle" font-size="11.5" font-weight="bold" letter-spacing="1" fill="#B26A00">DATA COLLECTION</text>
+  <text x="780" y="335" text-anchor="middle" font-size="11.5" font-weight="bold" letter-spacing="1" fill="#3B4C9E">FEATURE ENGINEERING &amp; TRAINING</text>
+  <text x="500" y="755" text-anchor="middle" font-size="11.5" font-weight="bold" letter-spacing="1" fill="#146357">APPLICATION LAYER</text>
+
+  <!-- API node -->
+  <rect x="60" y="112" width="260" height="76" rx="10" fill="#FFFFFF" stroke="#B0B0B0" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <text x="190" y="140" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#1F2430">Brawl Stars API</text>
+  <text x="190" y="158" text-anchor="middle" font-size="10.5" fill="#6B7280">official REST API (external)</text>
+
+  <!-- Collector node -->
+  <rect x="60" y="226" width="260" height="76" rx="10" fill="#FFFFFF" stroke="#D98E04" stroke-width="1.5"/>
+  <text x="190" y="254" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#1F2430">Collector</text>
+  <text x="190" y="272" text-anchor="middle" font-size="10.5" fill="#6B7280">crawler · dedup · seed injection</text>
+
+  <!-- SQLite DB node -->
+  <rect x="60" y="342" width="260" height="90" rx="10" fill="#FFFFFF" stroke="#4B5563" stroke-width="1.5"/>
+  <text x="190" y="370" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#1F2430">SQLite Database</text>
+  <text x="190" y="388" text-anchor="middle" font-size="10.5" fill="#6B7280">matches · players</text>
+  <text x="190" y="402" text-anchor="middle" font-size="10.5" fill="#6B7280">match_players</text>
+
+  <!-- Dataset Builder node -->
+  <rect x="650" y="349" width="260" height="76" rx="10" fill="#FFFFFF" stroke="#45569E" stroke-width="1.5"/>
+  <text x="780" y="377" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#1F2430">Dataset Builder</text>
+  <text x="780" y="395" text-anchor="middle" font-size="10.5" fill="#6B7280">feature eng. + leakage fix</text>
+
+  <!-- Training node -->
+  <rect x="650" y="465" width="260" height="76" rx="10" fill="#FFFFFF" stroke="#45569E" stroke-width="1.5"/>
+  <text x="780" y="493" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#1F2430">Model Training</text>
+  <text x="780" y="511" text-anchor="middle" font-size="10.5" fill="#6B7280">GradientBoostingClassifier</text>
+
+  <!-- Model Artifacts node -->
+  <rect x="650" y="581" width="260" height="76" rx="10" fill="#FFFFFF" stroke="#45569E" stroke-width="1.5"/>
+  <text x="780" y="609" text-anchor="middle" font-size="14.5" font-weight="bold" fill="#1F2430">Model Artifacts</text>
+  <text x="780" y="627" text-anchor="middle" font-size="10.5" fill="#6B7280">model.pkl + columns.pkl</text>
+
+  <!-- Streamlit App node -->
+  <rect x="220" y="780" width="560" height="90" rx="10" fill="#FFFFFF" stroke="#1E8074" stroke-width="1.5"/>
+  <text x="500" y="808" text-anchor="middle" font-size="15" font-weight="bold" fill="#1F2430">Streamlit Dashboard</text>
+  <text x="500" y="826" text-anchor="middle" font-size="10.5" fill="#6B7280">5 views · English / Portuguese toggle</text>
+  <text x="500" y="842" text-anchor="middle" font-size="10.5" fill="#6B7280">reads live from the database and the trained model</text>
+
+  <!-- vertical pipeline arrows -->
+  <line x1="190" y1="188" x2="190" y2="222" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="190" y1="302" x2="190" y2="338" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="780" y1="425" x2="780" y2="461" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="780" y1="541" x2="780" y2="577" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- DB -> Dataset Builder -->
+  <line x1="320" y1="387" x2="646" y2="387" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- DB -> Streamlit App (elbow), feeds meta views directly -->
+  <path d="M 190 432 L 190 826 L 216 826" fill="none" stroke="#B26A00" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="205" y="620" font-size="10" fill="#B26A00" transform="rotate(-90 205 620)" text-anchor="middle">feeds the three meta views</text>
+
+  <!-- Model Artifacts -> Streamlit App -->
+  <line x1="780" y1="657" x2="780" y2="776" stroke="#3B4C9E" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="796" y="720" font-size="10" fill="#3B4C9E" transform="rotate(-90 796 720)" text-anchor="middle">feeds the predictor + draft simulator</text>
+
+  <!-- connector stem to chips -->
+  <line x1="500" y1="870" x2="500" y2="900" stroke="#6B7280" stroke-width="1.5"/>
+  <line x1="150" y1="900" x2="850" y2="900" stroke="#6B7280" stroke-width="1.5"/>
+  <line x1="172" y1="900" x2="172" y2="916" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="336" y1="900" x2="336" y2="916" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="500" y1="900" x2="500" y2="916" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="664" y1="900" x2="664" y2="916" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="828" y1="900" x2="828" y2="916" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- view chips -->
+  <rect x="97" y="918" width="150" height="52" rx="8" fill="#FFF7E6" stroke="#D98E04" stroke-width="1.3"/>
+  <text x="172" y="940" text-anchor="middle" font-size="11" font-weight="bold" fill="#1F2430">Meta Brawlers</text>
+  <text x="172" y="955" text-anchor="middle" font-size="9" fill="#6B7280">pick rate · win rate</text>
+
+  <rect x="261" y="918" width="150" height="52" rx="8" fill="#FFF7E6" stroke="#D98E04" stroke-width="1.3"/>
+  <text x="336" y="940" text-anchor="middle" font-size="11" font-weight="bold" fill="#1F2430">Meta by Mode</text>
+  <text x="336" y="955" text-anchor="middle" font-size="9" fill="#6B7280">per game mode</text>
+
+  <rect x="425" y="918" width="150" height="52" rx="8" fill="#FFF7E6" stroke="#D98E04" stroke-width="1.3"/>
+  <text x="500" y="940" text-anchor="middle" font-size="11" font-weight="bold" fill="#1F2430">Meta by Map</text>
+  <text x="500" y="955" text-anchor="middle" font-size="9" fill="#6B7280">per specific map</text>
+
+  <rect x="589" y="918" width="150" height="52" rx="8" fill="#EEF1FC" stroke="#45569E" stroke-width="1.3"/>
+  <text x="664" y="940" text-anchor="middle" font-size="11" font-weight="bold" fill="#1F2430">Team Analyzer</text>
+  <text x="664" y="955" text-anchor="middle" font-size="9" fill="#6B7280">3v3 win probability</text>
+
+  <rect x="753" y="918" width="150" height="52" rx="8" fill="#EEF1FC" stroke="#45569E" stroke-width="1.3"/>
+  <text x="828" y="940" text-anchor="middle" font-size="11" font-weight="bold" fill="#1F2430">Draft Simulator</text>
+  <text x="828" y="955" text-anchor="middle" font-size="9" fill="#6B7280">top-5 recommendations</text>
+
+  <!-- legend -->
+  <rect x="330" y="994" width="14" height="14" rx="3" fill="#FFF7E6" stroke="#D98E04" stroke-width="1.3"/>
+  <text x="350" y="1005" font-size="10.5" fill="#374151">Database-driven (meta &amp; stats)</text>
+  <rect x="580" y="994" width="14" height="14" rx="3" fill="#EEF1FC" stroke="#45569E" stroke-width="1.3"/>
+  <text x="600" y="1005" font-size="10.5" fill="#374151">Model-driven (predictions)</text>
+</svg>
