@@ -2,32 +2,10 @@
 
 **A Brawl Stars analytics platform: real match data, a self-built ETL/ML pipeline, and a bilingual Streamlit dashboard for meta insights and win prediction.**
 
-![Python](https://img.shields.io/badge/Python-3.11-blue)
-![Streamlit](https://img.shields.io/badge/Streamlit-app-FF4B4B)
-![scikit--learn](https://img.shields.io/badge/scikit--learn-model-orange)
-![License](https://img.shields.io/badge/status-personal%20project-lightgrey)
-
 This project was born as a personal challenge right after finishing the AI Specialist track from Alura, as part of Santander's *Imersão Digital* program. I wanted to put the concepts into practice on something I actually care about instead of a toy dataset — so I picked Brawl Stars, a game I already know well, and set out to answer a simple question: **can you predict who wins a match?**
 
 Turns out the honest answer is "not really, not from the data you can actually get" — and that discovery ended up shaping the whole project. More on that below.
 
----
-
-## Table of Contents
-
-- [What it does](#what-it-does)
-- [Why a prediction model *and* a dashboard](#why-a-prediction-model-and-a-dashboard)
-- [Architecture](#architecture)
-- [The data pipeline](#the-data-pipeline)
-- [Model: what, why, and its real limits](#model-what-why-and-its-real-limits)
-- [The dashboard](#the-dashboard)
-- [Internationalization](#internationalization)
-- [Project structure](#project-structure)
-- [Running it locally](#running-it-locally)
-- [Lessons learned](#lessons-learned)
-- [Roadmap / ideas](#roadmap--ideas)
-
----
 
 ## What it does
 
@@ -48,7 +26,7 @@ The Brawl Stars API battlelog gives you *what* was picked (brawlers, map, mode) 
 1. **Player skill.** Two people with the same brawler at the same power level can have wildly different win rates depending on mechanical skill, game sense, and positioning. There's no field for that.
 2. **Brawler power/gear level relative to the opponent.** The API exposes it, but it's noisy, inconsistent across the playerbase, and not something a user planning a draft can reliably "input" ahead of time anyway — you don't know your opponent's gear before the match starts.
 
-In other words, the single biggest predictors of a win are things that are either *not in the data* or *not knowable at prediction time*. A model trained only on team composition, map, and mode was never going to be highly accurate — and I think pretending otherwise would have been dishonest.
+In other words, the single biggest predictors of a win are things that are either *not in the data* or *not knowable at prediction time*. A model trained only on team composition, map, and mode was never going to be highly accurate.
 
 So the project pivoted: instead of over-promising a "will I win?" oracle, I built out a proper **data visualization layer** (the meta views) as the real deliverable, and kept the predictive model as a secondary, clearly-scoped tool — a **composition-only signal**, not a crystal ball. The Team Analyzer and Draft Simulator are useful for "does this comp have a structural edge on this map," which is a fair question to ask of this data. They are not useful for "will I personally win this game," which depends on you.
 
@@ -84,17 +62,10 @@ I went with gradient boosting over alternatives like logistic regression or a pl
 - Compared to a single decision tree or a shallow random forest, boosting tends to generalize a bit better on data where the true signal-to-noise ratio is low — which, as discussed above, is exactly this dataset's situation. It doesn't fix the fundamental information gap, but it squeezes more out of what's actually there than a simpler linear model did in early testing.
 - It's fast enough to retrain from scratch on a few thousand matches on a laptop, which matters for an iterative side project with no dedicated training infrastructure.
 
-**Feature engineering**
-
-Each match becomes one row: the game mode and map (one-hot encoded), and each team's three brawlers represented as **multi-hot columns** (`t0_<brawler>`, `t1_<brawler>` = 1 or 0) rather than three ordered "brawler 1/2/3" slots. That encoding directly captures *which brawlers are on which team*, independent of pick order — a team of Bull + Poco + El Primo should look identical to the model no matter which slot each one was typed into.
-
-Deliberately **excluded**: brawler power level and trophies. They're in the raw data, but as explained above, they're not reliably available *before* a match starts, and including them would make the model unusable for its actual purpose (drafting), while also encouraging it to lean on a proxy for player skill instead of learning anything about composition.
-
 **Honest results**
 
-Cross-validated accuracy tops out around **68–70%**, against a majority-class baseline of roughly 50–51% (the dataset is close to balanced after the anti-bias fix). That's a real, non-trivial signal — team composition clearly matters — but it's far from a reliable win predictor, and it isn't trying to be one. I'd frame it as: **useful for spotting a structural composition disadvantage before a match, not useful for guaranteeing an outcome.**
+Cross-validated accuracy tops out around **68–70%**, against a majority-class baseline of roughly 50–51%. Team composition clearly matters, but it's far from a reliable win predictor. 
 
-The clearest lever to improve this further is more data. At the current dataset size (a few thousand matches), rarer brawler combinations are seen too few times for their win-rate signal to stabilize; scaling into the 10k–50k match range should sharpen the per-composition estimates meaningfully, even without changing the model or features at all.
 
 ## The dashboard
 
@@ -169,18 +140,4 @@ Once you have a database and a trained model in `data/storage/`, launch the dash
 streamlit run app/main.py
 ```
 
-## Lessons learned
 
-- **The most valuable outcome of this project wasn't the model — it was learning to recognize when a model *shouldn't* be trusted too far**, and building the visualization layer to be genuinely useful on its own instead of just a wrapper around a shaky prediction.
-- Label leakage can be extremely subtle. `team_id 0` correlating with "the crawler's seed player" wasn't an obvious bug — it only showed up as a suspiciously inflated accuracy number, which was the actual clue something was wrong.
-- Treating the `assets/` folders (brawler portraits, map images) as the single source of truth for "what counts as valid" turned out to be a clean way to keep the UI, the data filtering, and the model's feature space all in sync without maintaining three separate lists.
-
-## Roadmap / ideas
-
-- Scale data collection to 10k–50k+ matches to stabilize win-rate estimates for less common compositions.
-- Explore pairwise/synergy and counter-pick features explicitly (currently the model has to infer these interactions on its own from one-hot columns).
-- Add a lightweight model card / confidence indicator directly in the Team Analyzer and Draft Simulator UI, so the accuracy caveat is visible in-app, not just in this README.
-
----
-
-*Built as a self-directed project after completing Alura's AI Specialist track (Santander Imersão Digital). Not affiliated with Supercell.*
